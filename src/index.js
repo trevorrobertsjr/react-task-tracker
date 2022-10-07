@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+// "App" from the import is the root component.
+// Unless you change config, all code should go in App.js
 root.render(
   <React.StrictMode>
     <App />
