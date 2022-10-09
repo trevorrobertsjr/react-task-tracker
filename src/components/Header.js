@@ -7,15 +7,18 @@ import Button from './Button'
 
 // instead of props object as the parameter, can destructure for just the element you want
 // ({title}) instead of props
-const Header = ({ title }) => {
-    const onClick = () => {
-        console.log('Header Click')
-    }
+const Header = ({ title, onAdd, showAdd }) => {
+    // const onClick = () => {
+    //     // console.log('Header Click')
+    //     onAdd()
+    // }
     return (
         <header className='header'>
             <h1>{title}</h1>
-            <Button color='green' text='Add' onClick={onClick} />
-
+            <Button
+                color={showAdd ? 'red' : 'green'}
+                text={showAdd ? 'Close' : 'Add'}
+                onClick={onAdd} />
         </header>
     )
 }
