@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
+import Footer from './components/Footer'
+import About from './components/About'
 import Tasks from './components/Tasks'
 import AddTask from './components/AddTask'
+import TaskDetails from './components/TaskDetails'
+
+
 function App() {
   const [showAddTask, setShowAddTask] = useState(false)
   const [tasks, setTasks] = useState([])
@@ -67,31 +73,55 @@ function App() {
   const toggleReminder = async (id) => {
     const taskToToggle = await fetchTask(id)
     const updatedTask = { ...taskToToggle, reminder: !taskToToggle.reminder }
+    // console.log(updatedTask)
+    // wrong content type messes up content
+    //  I put application-json accidentally. that cleared out my data in the db.json
+
     const res = await fetch(`http://localhost:5080/tasks/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-type': 'application-json'
+        'Content-type': 'application/json'
       },
       body: JSON.stringify(updatedTask)
     })
 
     const data = await res.json()
-    setTasks(tasks.map((task) => task.id === id ? { ...task, reminder: !task.reminder } : task))
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? {
+          ...task, reminder:
+            data.reminder
+        } : task))
   }
 
   // If you don't want an explicit element returned and just the contents,
   // enclose code in <> </>
   // tasks.length check with tertiary operator to determine to show placeholder text or tasks
+
+  // to use react dom router, wrap entire return data in Router tag
+
+  //RESEARCH: How can i conditionally show About link so that It doesn't show up on About route?
   return (
-    <div className='container'>
-      <Header title="Task Tracker" onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
-      {showAddTask && <AddTask onAdd={addTask} />}
-      {tasks.length > 0 ? (
-        <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} />
-      ) : (
-        'No Tasks to Show'
-      )}
-    </div >
+    <Router>
+      <div className='container'>
+        <Header title="Task Tracker" onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
+        <Routes>
+          <Route path='/' element={
+            <>
+              {showAddTask && <AddTask onAdd={addTask} />}
+              {tasks.length > 0 ? (
+                <Tasks tasks={tasks} onDelete={deleteTask} onToggle={toggleReminder} />
+              ) : (
+                'No Tasks to Show'
+              )}
+            </>
+          } />
+          <Route path='/about' element={<About />} />
+          <Route path='/task/:id' element={<TaskDetails />} />
+        </Routes>
+        <Footer />
+      </div >
+    </Router>
   );
   // only a single element can be returned. NOT multiple divs for example
 }
